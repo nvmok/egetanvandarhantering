@@ -49,6 +49,7 @@ def addUser(opsy = osys):
     if opsy == 'Linux' or opsy == 'Linux2':
         cmd = f'useradd --password {passwordGen()} -c "{row["first_name"]} {row[last_name]}" -m {row[first_name]}.{row[last_name]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
     else:
+        #Problem med PATH (tom) och UserPrincipleName
         cmd = f'New-ADUSer -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -UserPrincipleName "{row["UserPrincipleName"]}" -Path "{row["path"]}" -AccountPassword (ConvertTo-SecureString "{passwordGen()}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
         print(cmd)
     returnedValue = subprocess.call(cmd, shell=True)
@@ -60,8 +61,9 @@ def deleteUser(opsy= osys):
         print(f'Deleting {row["delete_user"]}')
         cmd = f'userdel -r "${row["delete_user"]}"'
     else:
+        #Eventuellt fel med delete (KOLLA)
         cmd = f'Remove-ADUser -identity {row["delete_user"]}'
-    returnedDelValue subprocess.call(cmd, shell=True)
+    returnedDelValue = subprocess.call(cmd, shell=True)
     if returnedDelValue >= 1:
         print(f"Något gick fel.\nReturned Value: {returnedDelValue}")
 
