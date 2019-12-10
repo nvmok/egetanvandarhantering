@@ -31,7 +31,7 @@ def passwordGen(length=8):
     for c in range(length-4):
         cat = random.randint(1,4)
         if cat == 1:
-            password += random.choice(chars)
+            password += random.choice(chars1).lower()
         elif cat == 2:
             password += random.choice(chars1)
         elif cat == 3:
