@@ -3,13 +3,10 @@ import csv, subprocess, platform, os, random, string
 osys = platform.system()
 running = True
 meny = 0
-chars = "abcdefghijklmnopqrstuvwxyz"
 chars1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 chars2 = "0123456789"
 chars3 = "!#/()=#"
 row = ""
-
-# def generatePass(length=):
 
 def getFileLocation():
     working = False
@@ -27,7 +24,7 @@ def getFileLocation():
 
 def passwordGen(length=8):
     password = ''
-    password += random.choice(chars)
+    password += random.choice(chars1).lower()
     password += random.choice(chars1)
     password += random.choice(chars2)
     password += random.choice(chars3)
@@ -46,32 +43,33 @@ def passwordGen(length=8):
     return password
 
 def addUser(opsy = osys):
+    generatedPass = passwordGen()
     if opsy == 'Linux' or opsy == 'Linux2':
-        cmd = f'useradd --password {passwordGen()} -c "{row["first_name"]} {row[last_name]}" -m {row[first_name]}.{row[last_name]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
+        cmd = f'sudo useradd --password {generatedPass} -c "{row["first_name"]} {row["last_name"]}" -m {row["first_name"]}.{row["last_name"]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
+        returnedDelValue = subprocess.call(cmd, shell=True)
     else:
-        #Problem med PATH (tom) och UserPrincipleName
-        cmd = f'New-ADUser -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -UserPrincipleName "{row["UserPrincipleName"]}" -Path "{row["path"]}" -AccountPassword (ConvertTo-SecureString "{passwordGen()}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
+        cmd = f'New-ADUser -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -AccountPassword (ConvertTo-SecureString "{generatedPass}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
         print(cmd)
-    returnedValue = subprocess.call(cmd, shell=True)
+        returnedValue = subprocess.call(['powershell', cmd])
     if returnedValue >= 1:
         print(f"Något gick fel.\nReturned Value: {returnedValue}")
 
 def deleteUser(opsy= osys):
     if opsy == 'Linux' or opsy == 'Linux2':
         print(f'Deleting {row["delete_user"]}')
-        cmd = f'userdel -r "${row["delete_user"]}"'
+        cmd = f'sudo userdel -r "${row["delete_user"]}"'
+        returnedDelValue = subprocess.call(cmd, shell=True)
     else:
-        #Eventuellt fel med delete (KOLLA)
-        cmd = f'Remove-ADUser -identity {row["delete_user"]}'
-    returnedDelValue = subprocess.call(cmd, shell=True)
+        cmd = f'Remove-ADUser -Identity {delRow["delete_user"]} -Confirm:$false'
+        print(f'Tar bort konto {delRow["delete_user"]}')
+        returnedDelValue = subprocess.call(['powershell', cmd])
     if returnedDelValue >= 1:
         print(f"Något gick fel.\nReturned Value: {returnedDelValue}")
 
-print(f'''Välkommen,
-Du kör operativsystemet {osys}.''')
+print(f'Välkommen,\nDu kör operativsystemet {osys}.\nNotera: Denna kod fungerar endast för Linux och Windows.')
 
 while running:
-    if meny == 0:
+    if meny == 0: #Meny
         try:
             print("\nMeny\nLägg till användare [1]\nRadera användare [2]\nAvsluta [3]")
             meny = int(input("Val: "))
@@ -81,24 +79,21 @@ while running:
         except:
             print("Välj ett av de tillgänliga alternativen.")
             meny = 0
-    if meny == 1:
+    if meny == 1: #Add User
         correctCSVLocation = getFileLocation()
         with open (correctCSVLocation, newline='') as csvFile:
             readFile = csv.DictReader(csvFile)
             for row in readFile:
-                # print(row)
-                # print(f'Lösenord: {passwordGen()}')
-                # cmd = f'New-ADUSer -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -UserPrincipleName "{row["UserPrincipleName"]}" -Path "{row["path"]}" -PasswordNotRequired $True -ChangePasswordAtLogon $True'
-                # print(cmd)
-                addUser('Windows')
+                addUser()
         meny = 0
     
-    if meny == 2:
+    if meny == 2: #Remove User
         correctCSVLocation = getFileLocation()
-        with open (correctCSVLocation, newline='') as csvFile:
-            readFile = csv.DictReader(csvFile)
-            for row in readFile:
+        with open (correctCSVLocation, newline='', encoding="utf-8") as csvFileDel:
+            delReadFile = csv.DictReader(csvFileDel)
+            for delRow in delReadFile:
                 deleteUser()
+        meny = 0
 
-    if meny == 3:
+    if meny == 3: #Exit
         running = False
