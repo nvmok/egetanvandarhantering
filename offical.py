@@ -91,11 +91,17 @@ while running:
         meny = 0
 
     if meny == 2: #Remove User
+        print("1")
         correctCSVLocation = getFileLocation()
+        print("2")
         with open (correctCSVLocation, newline='') as csvFileDel:
+            print(3)
             delReadFile = csv.DictReader(csvFileDel)
+            print("4")
             for delRow in delReadFile:
+                print("5")
                 deleteUser()
+                print("6")
         meny = 0
 
     if meny == 3: #Exit
