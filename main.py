@@ -50,7 +50,7 @@ def addUser(opsy = osys):
         cmd = f'useradd --password {passwordGen()} -c "{row["first_name"]} {row[last_name]}" -m {row[first_name]}.{row[last_name]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
     else:
         #Problem med PATH (tom) och UserPrincipleName
-        cmd = f'New-ADUSer -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -UserPrincipleName "{row["UserPrincipleName"]}" -Path "{row["path"]}" -AccountPassword (ConvertTo-SecureString "{passwordGen()}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
+        cmd = f'New-ADUser -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -UserPrincipleName "{row["UserPrincipleName"]}" -Path "{row["path"]}" -AccountPassword (ConvertTo-SecureString "{passwordGen()}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
         print(cmd)
     returnedValue = subprocess.call(cmd, shell=True)
     if returnedValue >= 1:
