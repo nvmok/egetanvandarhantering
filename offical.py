@@ -17,8 +17,8 @@ def getFileLocation():
             print("Filen existerar inte, vänligen testa igen.")
         elif os.path.isfile(csvLocation) == True:
             print("Filen existerar.")
-            return csvLocation
             working = True
+            return csvLocation
         else:
             print("gg")
 
