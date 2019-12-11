@@ -42,7 +42,7 @@ def passwordGen(length=8):
 
     return password
 
-def addUser(opsy = osys, returnedValue = 0):
+def addUser(opsy = osys, returnedValue = 0, path = correctCSVLocation):
     generatedPass = passwordGen()
     if opsy == 'Linux' or opsy == 'Linux2':
         cmd = f'sudo useradd --password "{generatedPass}" -c "{row["first_name"]} {row["last_name"]}" -m {row["first_name"]}.{row["last_name"]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
@@ -54,6 +54,8 @@ def addUser(opsy = osys, returnedValue = 0):
         returnedValue = subprocess.call(['powershell', cmd])
     if returnedValue >= 1:
         print(f"Något gick fel.\nReturned Value: {returnedValue}")
+    with open('users.csv', 'a', newline='') as saveUsers:
+        writer = csv
 
 def deleteUser(opsy= osys, returnedDelValue = 0):
     if opsy == 'Linux' or opsy == 'Linux2':
@@ -88,6 +90,7 @@ while running:
             readFile = csv.DictReader(csvFile)
             for row in readFile:
                 addUser()
+                
         meny = 0
 
     if meny == 2: #Remove User
