@@ -47,7 +47,7 @@ def addUser(opsy = osys, returnedValue = 0):
     if opsy == 'Linux' or opsy == 'Linux2':
         cmd = f'sudo useradd --password "{generatedPass}" -c "{row["first_name"]} {row["last_name"]}" -m {row["first_name"]}.{row["last_name"]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
         print(cmd)
-        returnedDelValue = subprocess.call(cmd, shell=True)
+        returnedValue = subprocess.call(cmd, shell=True)
     else:
         cmd = f'New-ADUser -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -AccountPassword (ConvertTo-SecureString "{generatedPass}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
         print(cmd)
