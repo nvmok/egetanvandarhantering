@@ -42,20 +42,23 @@ def passwordGen(length=8):
 
     return password
 
-def addUser(opsy = osys, returnedValue = 0, path = correctCSVLocation):
+def addUser(opsy = osys, returnedValue = 0):
     generatedPass = passwordGen()
     if opsy == 'Linux' or opsy == 'Linux2':
         cmd = f'sudo useradd --password "{generatedPass}" -c "{row["first_name"]} {row["last_name"]}" -m {row["first_name"]}.{row["last_name"]}' #useradd --password Lösenord -c “Shrek Ogre” -m S.Ogre
         print(cmd)
         returnedValue = subprocess.call(cmd, shell=True)
     else:
-        cmd = f'New-ADUser -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -AccountPassword (ConvertTo-SecureString "{generatedPass}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True'
+        cmd = f'New-ADUser -Name "{row["first_name"]} {row["last_name"]}" -GivenName "{row["first_name"]}" -Surname "{row["last_name"]}" -SamAccountName "{row["SamAccountName"]}" -AccountPassword (ConvertTo-SecureString "{generatedPass}" -AsPlainText -force) -passThru -ChangePasswordAtLogon $True -Enabled $True'
         print(cmd)
         returnedValue = subprocess.call(['powershell', cmd])
     if returnedValue >= 1:
         print(f"Något gick fel.\nReturned Value: {returnedValue}")
-    with open('users.csv', 'a', newline='') as saveUsers:
-        writer = csv
+    else:
+        with open('created_users.csv', 'a', newline='') as saveUsers1:
+            fieldnames = ['SamAccountName', 'Password']
+            writer = csv.DictWriter(saveUsers1, fieldnames)
+            writer.writerow({'SamAccountName': row["SamAccountName"], 'Password': generatedPass})
 
 def deleteUser(opsy= osys, returnedDelValue = 0):
     if opsy == 'Linux' or opsy == 'Linux2':
@@ -85,6 +88,13 @@ while running:
             print("Välj ett av de tillgänliga alternativen.")
             meny = 0
     if meny == 1: #Add User
+        if os.path.isfile('created_users.csv') == False:
+            with open('created_users.csv', 'w', newline='') as csvfile:
+                fieldnames = ['SamAccountName', 'Password']
+                writer = csv.DictWriter(csvfile, fieldnames)
+                writer.writeheader()
+        else:
+            pass
         correctCSVLocation = getFileLocation()
         with open (correctCSVLocation, newline='') as csvFile:
             readFile = csv.DictReader(csvFile)
